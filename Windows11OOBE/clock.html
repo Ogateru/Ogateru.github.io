@@ -1,22 +1,753 @@
-<html>
-  <head>
-    <style>
-      * {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height:100vh;
-}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja-JP">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Cache-Control" content="no-cache">
 
-iframe {
-  border:none;
-  width:100%;
-  height:100%;
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" id="viewport">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="" id="apple-title">
+<link rel="apple-touch-icon" sizes="" href="" id="apple-icon1">
+<link rel="apple-touch-icon" sizes="" href="" id="apple-icon2">
+
+<link rel="manifest" href="" id="manifest">
+<link rel="icon" href="icon/favicon.ico">
+
+<link rel="stylesheet" type="text/css" href="main.css?v=0707c">
+<link rel="stylesheet" type="text/css" href="colorset-default.css?v=0707c" id="cssColorset">
+
+<script src="./dataArrays.js?v=1104a"></script>
+<script src="./dataClasses.js?v=1104a"></script>
+<script src="./setting.js?v=1104a"></script>
+<script src="./functions.js?v=1104a"></script>
+<script src="./viewfunctions.js?v=1104a"></script>
+
+<title>時計</title>
+
+<style TYPE="text/css">
+:root{
+	--short-weather-itr: calc(7.00vw * var(--r)); /* 短期予報 1日分ごとの縦位置の差 */
+	--week-weather-itr: calc(10.15vw * var(--r)); /* 週間予報 1日分ごとの横位置の差 */
 }
-    </style>
-  </head>
- 
-  <body>
-    <iframe src="https://ritska.com/clock/clock-5x4b.html?AREA_CODE=44132&COLORSET=1&CLOCK24H=0&COLON_BLINK=1&ZEROPAD=1&DEBUG=0"></iframe>
-  </body>
+</style>
+
+</head>
+<body class="main normalbg" id="main">
+
+<!-- ◆仮想枠◆ -->
+<div id="vbox" class="vbox" style="position: fixed;">
+
+<!-- ●●●時計 A枠●●●：ここから -->
+<div style="position: absolute; top: calc(1.50vw * var(--r)); left: calc(1.25vw * var(--r));">
+
+<!-- 時計：時・分・秒ここから -->
+<div style="position: absolute; top: 0vw; left: 0vw;">
+
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span class="clock-hourmin off">8.8.:8.8.</span><span class="clock-sec off" style="margin-left: calc(2.60vw * var(--r));">8.8.</span>
+</div>
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span id="strHour" class="clock-hourmin on">!!</span><span id="strColon" class="clock-hourmin on"> </span><span id="strMin" class="clock-hourmin on">!!</span><span id="strSec" class="clock-sec on" style="margin-left: calc(2.60vw * var(--r));">!!</span>
+</div>
+
+</div>
+<!-- 時計：時・分・秒ここまで -->
+
+<!-- 時計：AM/PMここから -->
+<div style="position: absolute; top: calc(0.60vw * var(--r)); left: calc(78.40vw * var(--r));">
+
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span class="clock-ampm off">~.~.</span>
+</div>
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span id="strAmpm" class="clock-ampm on">!!</span>
+</div>
+
+</div>
+<!-- 時計：AM/PMここまで -->
+
+
+<!-- 時計：年月日・曜日ここから -->
+<div style="position: absolute; top: calc(25.00vw * var(--r)); left: calc(0.85vw * var(--r));">
+
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span class="clock-date off">8.8.8.8.8.8.8.8.8.8.</span><span class="clock-week off" style="margin-left: calc(4.00vw * var(--r))">~.~.~.</span>
+</div>
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span id="strYMD" class="clock-date on">!!!!!!!!!!</span><span id="strWeekname" class="clock-week on" style="margin-left: calc(4.00vw * var(--r))">!!!</span>
+</div>
+
+</div>
+<!-- 時計：年月日・曜日ここまで -->
+
+</div>
+<!-- ●●●時計 A枠●●●：ここまで -->
+
+
+<!-- ●●●短期予報 A枠●●●：ここから -->
+<div style="position: absolute; top: calc(38.00vw * var(--r)); left: calc(2.60vw * var(--r));">
+
+<!-- ●●短期予報 凡例 B枠●●：ここから -->
+<div style="position: absolute; top: 0vw; left: 0vw;">
+
+<!-- 1行目： ここから -->
+<div style="position: absolute; top: 0vw; left: 0vw;">
+
+<hr class="engraved-hr" style="position: absolute; top: calc(1.10vw * var(--r)); left: 0vw; width: calc(39.00vw * var(--r));">
+
+<div style="position: absolute; top: 0vw; left: calc(39.10vw * var(--r));">
+<span class="engraved-chara-m">《短期予報》</span>
+</div>
+
+<hr class="engraved-hr" style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(55.80vw * var(--r)); width: calc(39.00vw * var(--r));">
+
+</div>
+<!-- 1行目： ここまで -->
+
+<!-- 2行目： ここから -->
+<div style="position: absolute; top: calc(3.00vw * var(--r)); left: 0;">
+<!--
+<div style="position: absolute; top: 0vw; left: calc(44.00vw * var(--r));">
+<span class="engraved-chara-m">降水確率</span>
+</div>
+
+<div style="position: absolute; top: 0vw; left: calc(79.50vw * var(--r));">
+<span class="engraved-chara-m">気 温</span>
+</div>
+-->
+
+<div style="position: absolute; top: 0vw; left: calc(44.00vw * var(--r));">
+<span class="engraved-chara-s">降水確率</span>
+</div>
+
+<div style="position: absolute; top: 0vw; left: calc(79.50vw * var(--r));">
+<span class="engraved-chara-s">気 温</span>
+</div>
+
+</div>
+<!-- 2行目： ここまで -->
+
+<!-- 3行目： ここから -->
+<div style="position: absolute; top: calc(9.90vw * var(--r)); left: 0;">
+
+<div style="position: absolute; top: 0vw; left: calc(31.50vw * var(--r));">
+<span class="engraved-chara-s">0-6</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(39.30vw * var(--r));">
+<span class="engraved-chara-s">6-12</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(47.30vw * var(--r));">
+<span class="engraved-chara-s">12-18</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(56.30vw * var(--r));">
+<span class="engraved-chara-s">18-24時</span>
+</div>
+
+<div style="position: absolute; top: 0vw; left: calc(74.50vw * var(--r));">
+<span class="engraved-chara-s">最 低</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(85.00vw * var(--r));">
+<span class="engraved-chara-s">最 高</span>
+</div>
+
+</div>
+<!-- 3行目： ここまで -->
+
+</div>
+<!-- ●●短期予報 凡例 B枠●●：ここまで -->
+
+<!-- ●●短期予報 B枠●●：ここから -->
+<div style="position: absolute; top: calc(2.50vw * var(--r)); left: 0vw;">
+
+<!-- ●短期予報0 C枠●：ここから -->
+<div style="position: absolute; top:  calc(var(--short-weather-itr) * 0); left: 0vw;">
+
+<!-- 短期予報0：日付ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: 0vw;">
+<span class="weather-digit off">8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: 0vw;">
+<span id="strWeather0Day" class="weather-digit on">!!</span>
+</div>
+<!-- 短期予報0：日付ここまで -->
+
+<!-- 短期予報0：マークここから -->
+<div style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(10.50vw * var(--r));">
+<span class="weather-mark off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(10.50vw * var(--r));">
+<span id="strWeather0Mark" class="weather-mark on">:;:</span>
+</div>
+<!-- 短期予報0：マークここまで -->
+
+<!-- 短期予報0：降水確率4個 ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(28.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(28.00vw * var(--r));">
+<span id="strWeather0PopA" class="weather-digit on">!!!</span>
+</div>
+
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(37.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(37.00vw * var(--r));">
+<span id="strWeather0PopB" class="weather-digit on">!!!</span>
+</div>
+
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(46.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(46.00vw * var(--r));">
+<span id="strWeather0PopC" class="weather-digit on">!!!</span>
+</div>
+
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(55.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">%</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(55.00vw * var(--r));">
+<span id="strWeather0PopD" class="weather-digit on">!!!</span>
+</div>
+<!-- 短期予報0：降水確率4個 ここまで -->
+
+<!-- 短期予報0：最低気温 ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(72.00vw * var(--r));">
+<span class="weather-digit off">8.8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.35vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(72.00vw * var(--r));">
+<span id="strWeather0TempMin" class="weather-digit on">!!!</span>
+</div>
+<!-- 短期予報0：最低気温 ここまで -->
+
+<!-- 短期予報0：最高気温 ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(82.60vw * var(--r));">
+<span class="weather-digit off">8.8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.35vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(82.60vw * var(--r));">
+<span id="strWeather0TempMax" class="weather-digit on">!!!</span>
+</div>
+<!-- 短期予報0：最高気温 ここまで -->
+
+</div>
+<!-- ●短期予報0 C枠●：ここまで -->
+
+
+<!-- ●短期予報1 C枠●：ここから -->
+<div style="position: absolute; top: calc(var(--short-weather-itr) * 1); left: 0vw;">
+
+<!-- 短期予報1：日付ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: 0vw;">
+<span class="weather-digit off">8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: 0vw;">
+<span id="strWeather1Day" class="weather-digit on">!!</span>
+</div>
+<!-- 短期予報1：日付ここまで -->
+
+<!-- 短期予報1：マークここから -->
+<div style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(10.50vw * var(--r));">
+<span class="weather-mark off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(10.50vw * var(--r));">
+<span id="strWeather1Mark" class="weather-mark on">:;:</span>
+</div>
+<!-- 短期予報1：マークここまで -->
+
+<!-- 短期予報1：降水確率4個 ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(28.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(28.00vw * var(--r));">
+<span id="strWeather1PopA" class="weather-digit on">!!!</span>
+</div>
+
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(37.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(37.00vw * var(--r));">
+<span id="strWeather1PopB" class="weather-digit on">!!!</span>
+</div>
+
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(46.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(46.00vw * var(--r));">
+<span id="strWeather1PopC" class="weather-digit on">!!!</span>
+</div>
+
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(55.00vw * var(--r));">
+<span class="weather-digit off">188</span><span class="engraved-chara-m" style="margin-left: calc(0.20vw * var(--r))">%</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(55.00vw * var(--r));">
+<span id="strWeather1PopD" class="weather-digit on">!!!</span>
+</div>
+<!-- 短期予報1：降水確率4個 ここまで -->
+
+<!-- 短期予報1：最低気温 ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(72.00vw * var(--r));">
+<span class="weather-digit off">8.8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.35vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(72.00vw * var(--r));">
+<span id="strWeather1TempMin" class="weather-digit on">!!!</span>
+</div>
+<!-- 短期予報1：最低気温 ここまで -->
+
+<!-- 短期予報1：最高気温 ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(82.60vw * var(--r));">
+<span class="weather-digit off">8.8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.35vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: calc(82.60vw * var(--r));">
+<span id="strWeather1TempMax" class="weather-digit on">!!!</span>
+</div>
+<!-- 短期予報1：最高気温 ここまで -->
+
+</div>
+<!-- ●短期予報1 C枠●：ここまで -->
+
+<!-- ●短期予報2 C枠●：ここから -->
+<div style="position: absolute; top: calc(var(--short-weather-itr) * 2); left: 0vw;">
+
+<!-- 短期予報2：日付ここから -->
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: 0vw;">
+<span class="weather-digit off">8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: calc(2.90vw * var(--r)); left: 0vw;">
+<span id="strWeather2Day" class="weather-digit on">!!</span>
+</div>
+<!-- 短期予報2：日付ここまで -->
+
+<!-- 短期予報2：マークここから -->
+<div style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(10.50vw * var(--r));">
+<span class="weather-mark off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(10.50vw * var(--r));">
+<span id="strWeather2Mark" class="weather-mark on">:;:</span>
+</div>
+<!-- 短期予報2：マークここまで -->
+
+<!-- 短期予報2：降水確率・気温は存在しない -->
+
+</div>
+<!-- ●短期予報2 C枠●：ここまで -->
+
+</div>
+<!-- ●●短期予報 B枠●●：ここまで -->
+
+</div>
+<!-- ●●●短期予報 A枠●●●：ここまで -->
+
+
+
+<!-- ●●●発表日時 A枠●●●： ここから -->
+<div style="position: absolute; top: calc(68.00vw * var(--r)); left: calc(2.60vw * var(--r));">
+
+<!-- 発表日時：日ここから -->
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span class="weather-digit off">8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span id="strReportDay" class="weather-digit on">!!</span>
+</div>
+<!-- 発表日時：日ここまで -->
+
+<!-- 発表日時：時ここから -->
+<div style="position: absolute; top: 0vw; left: calc(8.70vw * var(--r));">
+<span class="weather-digit off">8.8.</span><span class="engraved-chara-m" style="margin-left: calc(0.15vw * var(--r))">時 発表</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(8.70vw * var(--r));">
+<span id="strReportHour" class="weather-digit on">!!</span>
+</div>
+<!-- 発表日時：時ここまで -->
+
+<!-- 発表日時：アンダーラインここから -->
+<hr class="engraved-hr" style="position: absolute; top: calc(4.00vw * var(--r)); left: calc(0.20vw * var(--r)); width: calc(23.95vw * var(--r));">
+<!-- 発表日時：アンダーラインここまで -->
+
+</div>
+<!-- ●●●発表日時 A枠●●●： ここまで -->
+
+
+
+<!-- ●●●週間予報 A枠●●●：ここから -->
+<div style="position: absolute; top: calc(56.30vw * var(--r)); left: calc(28.00vw * var(--r));">
+
+<!-- ●●週間予報 凡例 B枠●●：ここから -->
+<div style="position: absolute; top: 0vw; left: 0vw;">
+
+<hr class="engraved-hr" style="position: absolute; top: calc(1.10vw * var(--r)); left: 0vw; width: calc(26.30vw * var(--r));">
+
+<div style="position: absolute; top: 0vw; left: calc(26.40vw * var(--r));">
+<span class="engraved-chara-m">《週間予報》</span>
+</div>
+
+<hr class="engraved-hr" style="position: absolute; top: calc(1.10vw * var(--r)); left: calc(43.10vw * var(--r)); width: calc(26.30vw * var(--r));">
+
+</div>
+<!-- ●●週間予報 凡例 B枠●●：ここまで -->
+
+
+
+<!-- ●●週間予報 B枠●●：ここから -->
+<div style="position: absolute; top: calc(3.40vw * var(--r)); left: 0vw;">
+
+<!-- ●週間予報0 C枠●：ここから -->
+<div style="position: absolute; top: 0vw; left: calc(var(--week-weather-itr) * 0);">
+
+<!-- 週間予報0：日付ここから -->
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span class="weather-digit-s off">8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span id="strWeekWeather0Day" class="weather-digit-s on">!!</span>
+</div>
+<!-- 週間予報0：日付ここまで -->
+
+<!-- 週間予報0：マークここから -->
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span class="weather-mark-s off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span id="strWeekWeather0Mark" class="weather-mark-s on">:;:</span>
+</div>
+<!-- 週間予報0：マークここまで -->
+
+<!-- 週間予報0：最低気温 ここから -->
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span id="strWeekWeather0TempMin" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報0：最低気温 ここまで -->
+
+<!-- 週間予報0：最高気温 ここから -->
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span id="strWeekWeather0TempMax" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報0：最高気温 ここまで -->
+
+</div>
+<!-- ●週間予報0 C枠●：ここまで -->
+
+<!-- ●週間予報1 C枠●：ここから -->
+<div style="position: absolute; top: 0vw; left: calc(var(--week-weather-itr) * 1);">
+
+<!-- 週間予報1：日付ここから -->
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span class="weather-digit-s off">8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span id="strWeekWeather1Day" class="weather-digit-s on">!!</span>
+</div>
+<!-- 週間予報1：日付ここまで -->
+
+<!-- 週間予報1：マークここから -->
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span class="weather-mark-s off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span id="strWeekWeather1Mark" class="weather-mark-s on">:;:</span>
+</div>
+<!-- 週間予報1：マークここまで -->
+
+<!-- 週間予報1：最低気温 ここから -->
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span id="strWeekWeather1TempMin" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報1：最低気温 ここまで -->
+
+<!-- 週間予報1：最高気温 ここから -->
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span id="strWeekWeather1TempMax" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報1：最高気温 ここまで -->
+
+</div>
+<!-- ●週間予報1 C枠●：ここまで -->
+
+<!-- ●週間予報2 C枠●：ここから -->
+<div style="position: absolute; top: 0vw; left: calc(var(--week-weather-itr) * 2);">
+
+<!-- 週間予報2：日付ここから -->
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span class="weather-digit-s off">8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span id="strWeekWeather2Day" class="weather-digit-s on">!!</span>
+</div>
+<!-- 週間予報2：日付ここまで -->
+
+<!-- 週間予報2：マークここから -->
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span class="weather-mark-s off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span id="strWeekWeather2Mark" class="weather-mark-s on">:;:</span>
+</div>
+<!-- 週間予報2：マークここまで -->
+
+<!-- 週間予報2：最低気温 ここから -->
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span id="strWeekWeather2TempMin" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報2：最低気温 ここまで -->
+
+<!-- 週間予報2：最高気温 ここから -->
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span id="strWeekWeather2TempMax" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報2：最高気温 ここまで -->
+
+</div>
+<!-- ●週間予報2 C枠●：ここまで -->
+
+<!-- ●週間予報3 C枠●：ここから -->
+<div style="position: absolute; top: 0vw; left: calc(var(--week-weather-itr) * 3);">
+
+<!-- 週間予報3：日付ここから -->
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span class="weather-digit-s off">8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span id="strWeekWeather3Day" class="weather-digit-s on">!!</span>
+</div>
+<!-- 週間予報3：日付ここまで -->
+
+<!-- 週間予報3：マークここから -->
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span class="weather-mark-s off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span id="strWeekWeather3Mark" class="weather-mark-s on">:;:</span>
+</div>
+<!-- 週間予報3：マークここまで -->
+
+<!-- 週間予報3：最低気温 ここから -->
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span id="strWeekWeather3TempMin" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報3：最低気温 ここまで -->
+
+<!-- 週間予報3：最高気温 ここから -->
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span id="strWeekWeather3TempMax" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報3：最高気温 ここまで -->
+
+</div>
+<!-- ●週間予報3 C枠●：ここまで -->
+
+<!-- ●週間予報4 C枠●：ここから -->
+<div style="position: absolute; top: 0vw; left: calc(var(--week-weather-itr) * 4);">
+
+<!-- 週間予報4：日付ここから -->
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span class="weather-digit-s off">8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span id="strWeekWeather4Day" class="weather-digit-s on">!!</span>
+</div>
+<!-- 週間予報4：日付ここまで -->
+
+<!-- 週間予報4：マークここから -->
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span class="weather-mark-s off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span id="strWeekWeather4Mark" class="weather-mark-s on">:;:</span>
+</div>
+<!-- 週間予報4：マークここまで -->
+
+<!-- 週間予報4：最低気温 ここから -->
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span id="strWeekWeather4TempMin" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報4：最低気温 ここまで -->
+
+<!-- 週間予報4：最高気温 ここから -->
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span id="strWeekWeather4TempMax" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報4：最高気温 ここまで -->
+
+</div>
+<!-- ●週間予報4 C枠●：ここまで -->
+
+<!-- ●週間予報5 C枠●：ここから -->
+<div style="position: absolute; top: 0vw; left: calc(var(--week-weather-itr) * 5);">
+
+<!-- 週間予報5：日付ここから -->
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span class="weather-digit-s off">8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span id="strWeekWeather5Day" class="weather-digit-s on">!!</span>
+</div>
+<!-- 週間予報5：日付ここまで -->
+
+<!-- 週間予報5：マークここから -->
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span class="weather-mark-s off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span id="strWeekWeather5Mark" class="weather-mark-s on">:;:</span>
+</div>
+<!-- 週間予報5：マークここまで -->
+
+<!-- 週間予報5：最低気温 ここから -->
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span id="strWeekWeather5TempMin" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報5：最低気温 ここまで -->
+
+<!-- 週間予報5：最高気温 ここから -->
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span id="strWeekWeather5TempMax" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報5：最高気温 ここまで -->
+
+</div>
+<!-- ●週間予報5 C枠●：ここまで -->
+
+<!-- ●週間予報6 C枠●：ここから -->
+<div style="position: absolute; top: 0vw; left: calc(var(--week-weather-itr) * 6);">
+
+<!-- 週間予報6：日付ここから -->
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span class="weather-digit-s off">8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">日</span>
+</div>
+<div style="position: absolute; top: 0vw; left: calc(1.50vw * var(--r));">
+<span id="strWeekWeather6Day" class="weather-digit-s on">!!</span>
+</div>
+<!-- 週間予報6：日付ここまで -->
+
+<!-- 週間予報6：マークここから -->
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span class="weather-mark-s off">0A0</span>
+</div>
+<div style="position: absolute; top: calc(2.75vw * var(--r)); left: 0vw;">
+<span id="strWeekWeather6Mark" class="weather-mark-s on">:;:</span>
+</div>
+<!-- 週間予報6：マークここまで -->
+
+<!-- 週間予報6：最低気温 ここから -->
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.20vw * var(--r))">/</span>
+</div>
+<div style="position: absolute; top: calc(7.60vw * var(--r)); left: calc(-0.15vw * var(--r));">
+<span id="strWeekWeather6TempMin" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報6：最低気温 ここまで -->
+
+<!-- 週間予報6：最高気温 ここから -->
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span class="weather-digit-s off">8.8.8.</span><span class="engraved-chara-s" style="margin-left: calc(0.15vw * var(--r))">℃</span>
+</div>
+<div style="position: absolute; top: calc(10.40vw * var(--r)); left: calc(0.90vw * var(--r));">
+<span id="strWeekWeather6TempMax" class="weather-digit-s on">!!!</span>
+</div>
+<!-- 週間予報6：最高気温 ここまで -->
+
+</div>
+<!-- ●週間予報6 C枠●：ここまで -->
+
+</div>
+<!-- ●●週間予報 B枠●●： ここまで -->
+
+</div>
+<!-- ●●●週間予報 A枠●●●：ここまで -->
+
+
+<!-- ●●●テロップ表示域●●● ここから -->
+<div style="position: absolute; top: calc(73.80vw * var(--r)); left: calc(2.60vw * var(--r));">
+
+<div style="position: absolute; top: 0vw; left: 0vw;">
+<span class="engraved-chara-s">短期予報：</span>
+</div>
+
+<div class="telop-back" style="position: absolute; top: calc(-0.30vw * var(--r)); left: calc(10.70vw * var(--r)); width: calc(35.00vw * var(--r));">
+</div>
+<div style="position: absolute; top: 0vw; left: calc(10.70vw * var(--r));">
+<span class="telop" id="strClass10sName">　</span>
+</div>
+
+<div style="position: absolute; top: 0vw; left: calc(49.00vw * var(--r));">
+<span class="engraved-chara-s">週間予報：</span>
+</div>
+
+<div class="telop-back" style="position: absolute; top: calc(-0.30vw * var(--r)); left: calc(59.70vw * var(--r)); width: calc(35.00vw * var(--r));">
+</div>
+<div style="position: absolute; top: 0vw; left: calc(59.70vw * var(--r));">
+<span class="telop" id="strPrefName">　</span>
+</div>
+
+<div style="position: absolute; top: calc(3.10vw * var(--r)); left: 0vw;">
+<span class="engraved-chara-s">上記カッコ内は気温予想地点</span>
+</div>
+
+</div>
+<!-- ●●●テロップ表示域●●● ここまで -->
+
+<!-- ●●●パイロットランプ●●● ここから -->
+<div style="position: absolute; top: calc(76.90vw * var(--r)); left: calc(68.30vw * var(--r));">
+<span id="networkStatusArea"><span id="lampNetwork" class="pilotlamp off" style="margin-right: calc(0.60vw * var(--r));">●</span><span class="engraved-chara-s">通信回線</span></span><!-- 
+--><span id="httpStatusArea"><span id="lampHttp" class="pilotlamp off" style="margin-left: calc(2.80vw * var(--r)); margin-right: calc(0.60vw * var(--r));">●</span><span class="engraved-chara-s">気象庁サーバ</span></span>
+</div>
+<!-- ●●●パイロットランプ●●● ここまで -->
+
+<!-- ●●●デバッグ表示 ここから -->
+<div style="position: absolute; top: calc(78.90vw * var(--r)); left: calc(30.00vw * var(--r));">
+<span class="engraved-chara-s-narrow" style="font-size: calc(1.00vw * var(--r)); color: darkgray;" id="strTest01"> </span>
+<span class="engraved-chara-s-narrow" style="font-size: calc(1.00vw * var(--r)); color: darkgray;" id="strTest02"> </span>
+</div>
+<!-- ●●●デバッグ表示 ここまで -->
+
+</div>
+<!-- ◆仮想枠◆ -->
+
+<script>
+const	DESIGN_WIDTH  = 5;
+const	DESIGN_HEIGHT = 4;
+</script>
+
+<script src="./parent.js?v=0707c"></script>
+
+</body>
 </html>
